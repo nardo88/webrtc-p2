@@ -68,7 +68,7 @@
   background-color: #2aca3e;
 }
 
-.member_name{
+.member_name {
   font-size: 14px;
   line-height: 0;
 }
@@ -113,23 +113,20 @@
   color: #ede0e0;
 }
 
-.message__body__bot{
+.message__body__bot {
   padding: 0 20px;
   max-width: 900px;
   color: #bdbdbd;
 }
 
-
 .message__author {
   margin-right: 10px;
-  color: #2aca3e!important;
-
+  color: #2aca3e !important;
 }
 
 .message__author__bot {
   margin-right: 10px;
-  color: #a52aca!important;
-
+  color: #a52aca !important;
 }
 
 .message__text {
@@ -174,6 +171,17 @@
   height: 100%;
 }
 
+#stream__box {
+  background-color: #3f433a;
+  height: 60vh;
+}
+
+.video__container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #b366f9;
+}
 
 @media (max-width: 1200px) {
   #members__container {
