@@ -176,11 +176,33 @@
   height: 60vh;
 }
 
+#streams__container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin-top: 25px;
+  margin-bottom: 225px;
+  gap: 32px;
+}
+
 .video__container {
   display: flex;
   justify-content: center;
   align-items: center;
   border: 2px solid #b366f9;
+  border-radius: 50%;
+  cursor: pointer;
+  overflow: hidden;
+  width: 300px;
+  height: 300px;
+}
+
+@media (max-width: 1200px) {
+  .video__container {
+    width: 200px;
+    height: 200px;
+  }
 }
 
 @media (max-width: 1200px) {
@@ -223,6 +245,11 @@
 
   #chat__button {
     display: block;
+  }
+
+  .video__container {
+    width: 100px;
+    height: 100px;
   }
 }
 
