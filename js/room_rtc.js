@@ -25,6 +25,7 @@ const joinRoomInit = async () => {
   await client.join(APP_ID, roomId, token, uid);
 
   client.on("user-published", handleUserPublished);
+  client.on("user-left", handleUserLeft);
 
   joinStream();
 };
@@ -39,6 +40,9 @@ const joinStream = async () => {
   document
     .getElementById("streams__container")
     .insertAdjacentHTML("beforeend", player);
+  document
+    .getElementById(`user-container-${uid}`)
+    .addEventListener("click", expandeVideoFrame);
 
   localTracks[1].play(`user-${uid}`);
 
@@ -58,8 +62,15 @@ const handleUserPublished = async (user, mediaType) => {
     document
       .getElementById("streams__container")
       .insertAdjacentHTML("beforeend", player);
+    document
+      .getElementById(`user-container-${user.uid}`)
+      .addEventListener("click", expandeVideoFrame);
   }
 
+  if (displayFrame.style.display) {
+    player.style.height = "100px";
+    player.style.width = "100px";
+  }
   if (mediaType === "video") {
     user.videoTrack.play(`user-${user.uid}`);
   }
@@ -68,6 +79,21 @@ const handleUserPublished = async (user, mediaType) => {
   }
 };
 
+const handleUserLeft = async (user) => {
+  delete remoteUsers[user.uid];
+  document.getElementById(`user-container-${user.uid}`).remove();
+
+  if (iserIdInDisplayFrame === `user-container-${user.uid}`) {
+    displayFrame.style.display = null;
+    const videoFrames = document.getElementsByClassName("video__container");
+
+    for (let i = 0; videoFrames.length > i; i++) {
+      videoFrames[i].style.height = "300px";
+      videoFrames[i].style.width = "300px";
+    }
+  }
+};
+
 joinRoomInit();
 
-// 2:23:28
+// 2:45:40
