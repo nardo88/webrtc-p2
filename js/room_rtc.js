@@ -19,6 +19,8 @@ if (!roomId) {
 
 let localTracks = [];
 let remoteUsers = {};
+let localScreenTracks;
+let sharingScreen = false;
 
 const joinRoomInit = async () => {
   client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
@@ -128,9 +130,53 @@ const toggleMic = async (e) => {
   }
 };
 
+const toggleScreen = async (e) => {
+  const screenButton = e.currentTarget;
+  const cameraButton = document.getElementById("camera-btn");
+
+  if (!sharingScreen) {
+    sharingScreen = true;
+
+    screenButton.classList.add("active");
+    cameraButton.classList.remove("active");
+    cameraButton.style.display = "none";
+
+    localScreenTracks = await AgoraRTC.createScreenVideoTrack();
+    document.getElementById(`user-container-${uid}`).remove();
+    displayFrame.style.display = "block";
+    const player = `<div class="video__container" id="user-container-${uid}">
+    <div class="video-player" id="user-${uid}"></div>
+    </div>`;
+
+    displayFrame.insertAdjacentHTML("beforeend", player);
+    document
+      .getElementById(`user-container-${uid}`)
+      .addEventListener("click", expandeVideoFrame);
+
+    userIdInDisplayFrame = `user-container-${uid}`;
+    localScreenTracks.play(`user-${uid}`);
+
+    await client.unpublish([localTracks[1]]);
+    await client.publish([localScreenTracks]);
+
+    const videoFrames = document.getElementsByClassName("video__container");
+    for (let i = 0; videoFrames.length > i; i++) {
+      if (videoFrames[i].id !== iserIdInDisplayFrame) {
+        videoFrames[i].style.height = "100px";
+        videoFrames[i].style.width = "100px";
+      }
+    }
+  } else {
+    sharingScreen = false;
+
+    cameraButton.style.display = "block";
+  }
+};
+
 document.getElementById("camera-btn").addEventListener("click", toggleCamera);
 document.getElementById("mic-btn").addEventListener("click", toggleMic);
+document.getElementById("screen-btn").addEventListener("click", toggleScreen);
 
 joinRoomInit();
 
-// 3:00:09
+// 3:13:47
