@@ -9,12 +9,20 @@ if (!uid) {
 let token = null;
 let client;
 
+// Клиент для чата
+let rtmClient;
+let channel;
+
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 let roomId = urlParams.get("room");
 
 if (!roomId) {
   roomId = "main";
+}
+const displayName = localStorage.getItem("display_name");
+if (!displayName) {
+  window.location = "lobby.html";
 }
 
 let localTracks = [];
@@ -23,6 +31,16 @@ let localScreenTracks;
 let sharingScreen = false;
 
 const joinRoomInit = async () => {
+  // подключание к чату
+  rtmClient = await AgoraRTM.createInstance(APP_ID);
+  await rtmClient.login({ uid, token });
+
+  channel = await rtmClient.createChannel(roomId);
+  await channel.join();
+
+  channel.on("MemberJoined", handleMemberJoined);
+
+  // подключение к RTC
   client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
   await client.join(APP_ID, roomId, token, uid);
 
@@ -58,6 +76,22 @@ const joinStream = async () => {
   localTracks[1].play(`user-${uid}`);
 
   await client.publish([localTracks[0], localTracks[1]]);
+};
+
+const switchToCamera = async () => {
+  const player = `<div class="video__container" id="user-container-${uid}">
+                        <div class="video-player" id="user-${uid}"></div>
+                    </div>`;
+
+  displayFrame.insertAdjacentHTML("beforeend", player);
+  await localTracks[0].setMuted(true);
+  await localTracks[1].setMuted(true);
+
+  document.getElementById("mic-btn").classList.remove("active");
+  document.getElementById("screen-btn").classList.remove("active");
+
+  localTracks[1].play(`user-${uid}`);
+  await client.publish([localTracks[1]]);
 };
 
 const handleUserPublished = async (user, mediaType) => {
@@ -168,8 +202,11 @@ const toggleScreen = async (e) => {
     }
   } else {
     sharingScreen = false;
-
     cameraButton.style.display = "block";
+    document.getElementById(`user-container-${uid}`).remove();
+    await client.unpublish([localScreenTracks]);
+
+    switchToCamera();
   }
 };
 
